@@ -1,0 +1,151 @@
+# interfaz.py
+#Añadi unicamente este codigo para mostrar como ordena los paises
+'''
+import tkinter as tk
+from tkinter import ttk, messagebox
+import csv
+import os
+
+# --- Variables Globales ---
+estado_orden = {}
+dataset_paises = []
+
+# --- Funciones de Datos y Lógica (sin cambios) ---
+
+def cargar_datos_en_memoria(archivo_csv):
+    # ... (Esta función no cambia)
+    dataset = []
+    try:
+        if not os.path.exists(archivo_csv):
+            raise FileNotFoundError
+        with open(archivo_csv, mode='r', encoding='utf-8') as archivo:
+            lector_csv = csv.DictReader(archivo)
+            for fila in lector_csv:
+                dataset.append(fila)
+        return dataset
+    except FileNotFoundError:
+        messagebox.showerror("Error", f"No se encontró el archivo de datos:\n{archivo_csv}")
+        return None
+    except Exception as e:
+        messagebox.showerror("Error", f"Ocurrió un error al leer el archivo: {e}")
+        return None
+
+def mostrar_datos_en_treeview(tree, dataset, columnas):
+    """
+    Limpia el Treeview y lo llena con datos, usando solo las columnas especificadas.
+    """
+    tree.delete(*tree.get_children())
+    if not dataset:
+        return
+    
+    for fila_dict in dataset:
+        # Crea una lista de valores solo para las columnas que queremos mostrar
+        valores = [fila_dict.get(col, '') for col in columnas]
+        tree.insert("", "end", values=valores)
+
+def ordenar_columna(tree, col, dataset_local, columnas):
+    """Ordena los datos del dataset por una columna específica y actualiza el Treeview."""
+    global estado_orden
+    es_descendente = estado_orden.get(col, False)
+    estado_orden = {col: not es_descendente}
+    
+    def clave_orden(item):
+        valor = item.get(col, '')
+        try:
+            return float(valor)
+        except (ValueError, TypeError):
+            return str(valor).lower()
+
+    dataset_local.sort(key=clave_orden, reverse=es_descendente)
+    mostrar_datos_en_treeview(tree, dataset_local, columnas)
+
+def ordenar_desde_controles():
+    """Se activa con el botón 'Ordenar'."""
+    mapa_columnas = {
+        "Nombre": "nombre_comun_es",
+        "Población": "poblacion",
+        "Superficie": "area",
+        "Continente": "continente" # Añadido
+    }
+    opcion_elegida = combo_ordenar.get()
+    if not opcion_elegida:
+        messagebox.showwarning("Aviso", "Por favor, selecciona un criterio para ordenar.")
+        return
+    columna_a_ordenar = mapa_columnas[opcion_elegida]
+    # Definimos aquí las columnas que se deben pasar para la actualización
+    columnas_visibles = list(mapa_columnas.values())
+    ordenar_columna(tree, columna_a_ordenar, dataset_paises, columnas_visibles)
+
+# --- FUNCIÓN PRINCIPAL DE LA INTERFAZ ---
+def iniciar_interfaz():
+    """Crea y ejecuta la interfaz gráfica principal."""
+    global dataset_paises, combo_ordenar, tree
+    
+    ventana = tk.Tk()
+    ventana.title("Visor de Datos de Países")
+    ventana.geometry("1000x600")
+
+    ruta_csv = os.path.join("Continentes", "Todos.csv")
+    dataset_paises = cargar_datos_en_memoria(ruta_csv)
+    
+    if dataset_paises is None:
+        dataset_paises = []
+
+    # --- Paneles ---
+    frame_izquierda = ttk.Frame(ventana, width=200)
+    frame_derecha = ttk.Frame(ventana)
+    frame_izquierda.pack(side="left", fill="y", padx=10, pady=10)
+    frame_derecha.pack(side="right", fill="both", expand=True, padx=10, pady=10)
+
+    # --- Panel Izquierdo ---
+    ttk.Label(frame_izquierda, text="Menú de Acciones", font=("Helvetica", 12, "bold")).pack(pady=10)
+    
+    ttk.Label(frame_izquierda, text="Ordenar por:").pack(pady=(10,0))
+    # Creamos el menú desplegable (Combobox)
+    opciones_orden = ["Nombre", "Población", "Superficie"]
+    combo_ordenar = ttk.Combobox(frame_izquierda, values=opciones_orden, state="readonly")
+    combo_ordenar.pack(fill="x", padx=5)
+    combo_ordenar.set(opciones_orden[0])
+    
+    ttk.Button(frame_izquierda, text="Ordenar (Asc/Desc)", command=ordenar_desde_controles).pack(pady=5)
+    
+    # ... otros botones ...
+
+    # --- Panel Derecho (Tabla de datos) ---
+    ttk.Label(frame_derecha, text="Países del Mundo", font=("Helvetica", 10)).pack(pady=(0, 5))
+    
+    # --- CAMBIO CLAVE: DEFINIMOS LAS COLUMNAS A MOSTRAR ---
+    # Mapa de nombres internos a títulos para mostrar en la cabecera
+    columnas_a_mostrar = {
+        "nombre_comun_es": "Nombre",
+        "poblacion": "Población",
+        "area": "Superficie",
+        "continente": "Continente"
+    }
+    
+    # Extraemos los nombres internos para usarlos al obtener los datos
+    nombres_internos_columnas = list(columnas_a_mostrar.keys())
+
+    tree = ttk.Treeview(frame_derecha, columns=nombres_internos_columnas, show="headings")
+    
+    # Configuración de las cabeceras usando el mapa
+    for internal_name, display_name in columnas_a_mostrar.items():
+        tree.heading(internal_name, text=display_name)
+        tree.column(internal_name, width=150, anchor='center')
+        
+    vsb = ttk.Scrollbar(frame_derecha, orient="vertical", command=tree.yview)
+    hsb = ttk.Scrollbar(frame_derecha, orient="horizontal", command=tree.xview)
+    tree.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
+    vsb.pack(side='right', fill='y')
+    hsb.pack(side='bottom', fill='x')
+    tree.pack(side='left', fill='both', expand=True)
+
+    # Muestra los datos iniciales
+    if dataset_paises:
+        mostrar_datos_en_treeview(tree, dataset_paises, nombres_internos_columnas)
+
+    ventana.mainloop()
+
+if __name__ == "__main__":
+    iniciar_interfaz()
+'''
