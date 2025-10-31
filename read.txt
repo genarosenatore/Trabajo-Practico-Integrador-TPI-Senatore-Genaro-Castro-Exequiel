@@ -1,0 +1,50 @@
+Explicación del Programa: Visor de Datos de Países Globales
+Este proyecto es un Visor de Datos Geográficos y Demográficos de Países implementado en Python, utilizando la biblioteca tkinter para la interfaz gráfica. Su funcionalidad principal es obtener datos actualizados de una API pública (restcountries.com), consolidarlos y presentarlos de forma interactiva.
+
+Módulos Principales
+El programa está estructurado en varios archivos Python que cumplen roles específicos:
+
+1. main.py (Orquestador Principal)
+Es el punto de entrada que coordina la ejecución de las tareas.
+
+
+Descarga de Datos: Ejecuta la descarga de datos de países para los continentes ('Africa', 'Americas', 'Asia', 'Europe', 'Oceania', 'Antarctic') y los guarda en archivos CSV individuales dentro de una carpeta llamada Continentes.
+
+
+Unificación de Datos: Llama a la función para unificar todos los CSV de continentes en un único archivo maestro llamado Continentes/Todos.csv.
+
+
+Inicio de la GUI: Una vez que los datos están listos, inicia la interfaz gráfica definida en interfaz.py.
+
+2. generarPaises.py (Adquisición y Preparación de Datos)
+Contiene las funciones encargadas de manejar la conexión con la API y la manipulación de archivos CSV.
+
+
+obtener_y_guardar_paises: Se conecta a la API restcountries.com, extrae información clave de cada país (como nombre común en español, capital, población y área) y la escribe en un archivo CSV específico para su continente.
+
+
+unir_csvs_en_uno: Busca todos los archivos CSV generados por continente, les añade una nueva columna llamada continente (cuyo valor se extrae del nombre del archivo) y fusiona todos los registros en el archivo Todos.csv.
+
+3. interfaz.py (Interfaz Gráfica - GUI)
+Contiene toda la lógica visual y de interacción con el usuario utilizando tkinter. Carga el archivo Todos.csv y lo muestra en una tabla interactiva (Treeview).
+
+Funcionalidades de la Interfaz Gráfica
+La aplicación ofrece las siguientes herramientas para interactuar con los datos de los países:
+
+Funcionalida/Descripción
+Visualización: Muestra los datos de Nombre, Población, Superficie y Continente en una tabla.
+
+Ordenamiento: Permite ordenar la tabla de forma Ascendente o Descendente por las columnas Nombre, Población, Superficie o Continente.
+
+Búsqueda Rápida: Filtra los países en la tabla para mostrar solo aquellos cuyo nombre comienza con el texto introducido.
+
+Filtrado Avanzado: Abre una ventana de diálogo para aplicar filtros combinados por Continente, Rango de Población y Rango de Superficie (km²).
+
+Estadísticas: Muestra una ventana con métricas clave del conjunto de datos, como el país con mayor/menor población, el promedio global de población y superficie, y el conteo de países por continente.
+
+Créditos: Muestra información sobre los desarrolladores del programa.
+
+
+Configuración del Entorno
+requirements.txt: Indica las librerías de Python necesarias para que el programa funcione, siendo la principal requests para las peticiones a la API.
+dockerfile: Provee una configuración de Docker para ejecutar la aplicación dentro de un contenedor, asegurando que el entorno tenga instalada la dependencia del sistema tk (necesaria para tkinter) y que se ejecute el archivo main.py.
